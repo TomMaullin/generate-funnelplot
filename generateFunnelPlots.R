@@ -5,6 +5,8 @@ generateFunnelPlots <- function(mean, var, n, pubBias = FALSE){
 	studySizes = c(rexp(floor(n/2), 0.45) + 1, rexp(ceiling(n/2), 0.1) + 1);
 	studyObservedMeans = c();
 	assigned = FALSE;
+	
+	#Run some trials
 	for(i in 1:n){
 		assigned = FALSE;
 		while(assigned == FALSE){
@@ -18,6 +20,7 @@ generateFunnelPlots <- function(mean, var, n, pubBias = FALSE){
 	z = qnorm(0.999, mean = 0, sd = 1, log = FALSE);
 	standardErrors = var/sqrt(studySizes);
 	counter = 0;
+	#Remove values that are too extreme (this is for display purposes only and should not be done for any other reason)
 	for(i in 1:n){
 		if(studyObservedMeans[i-counter] > (mean+z*standardErrors[i-counter]) || studyObservedMeans[i-counter] < mean-z*standardErrors[i-counter]){
 			studyObservedMeans = studyObservedMeans[-(i-counter)];
@@ -25,10 +28,11 @@ generateFunnelPlots <- function(mean, var, n, pubBias = FALSE){
 			counter = counter+1;
 		}
 	}
+	
+	#Plot.
 	x = range(studyObservedMeans);
 	y = range(standardErrors);
 	plot(studyObservedMeans, standardErrors, xlim = c(x[1]-5, x[2]+5), ylim = rev(range(c(-1, y[2]))), , xlab = 'Observed effect', ylab = 'Standard Error', yaxs = "i", xaxs = "i");
 	segments(mean, 0, mean+z*y[2], y[2])
 	segments(mean, 0, mean-z*y[2], y[2])
 }
-generateFunnelPlots(7, 3, 900)
